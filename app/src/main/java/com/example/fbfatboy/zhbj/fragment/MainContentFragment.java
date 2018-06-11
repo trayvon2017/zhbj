@@ -105,7 +105,9 @@ public class MainContentFragment extends BaseFragment {
         });
     }
 
-
+    public NewsPager getNewsPager() {
+        return (NewsPager)mPagers.get(1);
+    }
 
 
     private class MyPagerAdapter extends PagerAdapter {

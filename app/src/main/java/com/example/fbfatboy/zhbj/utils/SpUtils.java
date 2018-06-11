@@ -18,5 +18,15 @@ public class SpUtils {
 
         return context.getSharedPreferences("config", Context.MODE_PRIVATE).getBoolean(key,true);
     }
+    public static void putString(Context context,String key,String value){
+        SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(key,value);
+        editor.apply();
+    }
+    public static String getString(Context context,String key){
+
+        return context.getSharedPreferences("config", Context.MODE_PRIVATE).getString(key,"");
+    }
 
 }

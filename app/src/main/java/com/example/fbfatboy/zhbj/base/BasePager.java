@@ -28,9 +28,23 @@ public class BasePager {
         mTv_basepager = (TextView) view.findViewById(R.id.tv_basepager);
         mIb_basepager = (ImageButton) view.findViewById(R.id.ib_basepager);
         mFl_basepager = (FrameLayout) view.findViewById(R.id.fl_basepager);
+        mIb_basepager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggle();
+            }
+        });
         
         return view;
 
     }
+
+    private void toggle() {
+        MainActivity mainUI = (MainActivity)mActivity;
+        mainUI.getSlidingMenu().toggle();
+    }
+
     public void initData(){};
+
+
 }
