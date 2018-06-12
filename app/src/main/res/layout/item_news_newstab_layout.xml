@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/iv_listimage"
+            android:layout_marginRight="5dp"
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:background="#a000"
+            android:padding="1dp"
+            android:scaleType="fitXY"
+            />
+        <TextView
+            android:id="@+id/tv_news_title"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:layout_toRightOf="@id/iv_listimage"
+            android:text="束帶結髮立刻就煩了放假啊薩達的垃圾速度快垃圾大阿薩達"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_news_pubdate"
+            android:layout_toRightOf="@id/iv_listimage"
+            android:layout_below="@id/tv_news_title"
+            android:layout_marginTop="5dp"
+            android:text="2018-06-12 23:19"
+            android:textColor="#8000"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
