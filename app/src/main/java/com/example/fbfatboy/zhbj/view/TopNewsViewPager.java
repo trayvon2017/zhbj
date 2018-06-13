@@ -3,6 +3,7 @@ package com.example.fbfatboy.zhbj.view;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -11,6 +12,9 @@ import android.view.MotionEvent;
 
 public class TopNewsViewPager extends ViewPager {
 
+
+    private int startX;
+    private int startY;
 
     public TopNewsViewPager(Context context) {
         super(context);
@@ -22,23 +26,42 @@ public class TopNewsViewPager extends ViewPager {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        requestDisallowInterceptTouchEvent(true);
-        //
-        /*switch (ev.getAction()){
-            case MotionEvent.ACTION_DOWN:
 
+        getParent().requestDisallowInterceptTouchEvent(true);
+
+        switch (ev.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                startX = (int) ev.getX();
+                startY = (int) ev.getY();
+                Log.d("ACTION_DOWN", "dispatchTouchEvent: "+ startX +"-"+ startY);
                 break;
             case MotionEvent.ACTION_MOVE:
+                int moveX = (int) ev.getX();
+                int moveY = (int) ev.getY();
+                int dX = moveX - startX;
+                int dY = moveY - startY;
+                Log.d("ACTION_MOVE", "dispatchTouchEvent: "+ startX +"-"+ startY);
+                //
+                if (dX>0){
+                    //在第一页的时候拦截
+                    if(getCurrentItem() == 0){
+                        getParent().requestDisallowInterceptTouchEvent(false);
+                    }
+                }else{
+
+                    if (getCurrentItem()==(getAdapter().getCount()-1)){
+
+                        getParent().requestDisallowInterceptTouchEvent(false);
+                    }
+                }
 
                 break;
             case MotionEvent.ACTION_UP:
 
                 break;
 
-        }*/
-        if (getCurrentItem()==0||(getCurrentItem()==(getAdapter().getCount()-1))){
-            requestDisallowInterceptTouchEvent(false);
         }
+
         return super.dispatchTouchEvent(ev);
     }
 }
