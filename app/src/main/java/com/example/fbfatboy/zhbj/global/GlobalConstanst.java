@@ -9,4 +9,5 @@ package com.example.fbfatboy.zhbj.global;
 public class GlobalConstanst {
     public static final String ZHBJ_SERVER = "http://10.0.2.2:8080/zhbj";
     public static final String CATEGORY_JSON = "/categories.json";
+    public static final String PHOTOS_JSON = ZHBJ_SERVER+"/photos/photos_1.json";
 }

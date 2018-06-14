@@ -95,7 +95,7 @@ public class NewsPager extends BasePager {
         mDetailPagers = new ArrayList<BaseMenuDetailPager>();
         mDetailPagers.add(new NewsMunuDetailPager(mActivity,mNewsMenu.data.get(0).children));
         mDetailPagers.add(new TopicMunuDetailPager(mActivity));
-        mDetailPagers.add(new PhotosMunuDetailPager(mActivity));
+        mDetailPagers.add(new PhotosMunuDetailPager(mActivity,ib_changeStyle));
         mDetailPagers.add(new InteractMunuDetailPager(mActivity));
         //默认设置新闻页面
         setData(0);
@@ -107,5 +107,10 @@ public class NewsPager extends BasePager {
         mDetailPagers.get(position).initData();
         mFl_basepager.addView(mDetailPagers.get(position).mRootVew);
         mTv_basepager.setText(mNewsMenu.data.get(position).title);
+        if (position == 2){
+            ib_changeStyle.setVisibility(View.VISIBLE);
+        }else {
+            ib_changeStyle.setVisibility(View.GONE);
+        }
     }
 }

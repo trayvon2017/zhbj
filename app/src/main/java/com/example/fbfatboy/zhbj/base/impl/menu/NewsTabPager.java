@@ -220,22 +220,26 @@ public class NewsTabPager extends BaseMenuDetailPager {
         tv_topnews_title.setText(mTopNews.get(0).title);
         //发送空的message 处置轮播
         if (mHandler == null){
+            Log.d(TAG, "processData: mhandler:在"+mUrl+"执行了");
             mHandler = new Handler(){
                 @Override
                 public void handleMessage(Message msg) {
                     if (msg.what == 0){
+                        Log.d(TAG, "processData: handleMessage:在"+mUrl+"执行了");
                         int currentItem = vp_topNews.getCurrentItem();
-                        currentItem++;
+
                         if (currentItem == mTopNews.size()-1 ){
                             currentItem = 0;
+                        }else{
+                            currentItem = currentItem +1;
                         }
                         vp_topNews.setCurrentItem(currentItem);
-                        sendEmptyMessageDelayed(0,5000);
+                        sendEmptyMessageDelayed(0,3000);
                     }
 
                 }
             };
-            mHandler.sendEmptyMessageDelayed(0,5000);
+            mHandler.sendEmptyMessageDelayed(0,3000);
 
             vp_topNews.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -248,7 +252,7 @@ public class NewsTabPager extends BaseMenuDetailPager {
                             break;
                         case MotionEvent.ACTION_UP:
 
-                            mHandler.sendEmptyMessageDelayed(0,5000);
+                            mHandler.sendEmptyMessageDelayed(0,3000);
                             break;
                         case MotionEvent.ACTION_CANCEL:
 

@@ -13,6 +13,7 @@ public class NewsTabBean {
         public ArrayList<NewsBean> news;
         public ArrayList<TopNewsBean> topnews;
 
+
     }
 
 

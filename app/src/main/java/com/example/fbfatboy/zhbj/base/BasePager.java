@@ -18,6 +18,7 @@ public class BasePager {
     public TextView mTv_basepager;
     public ImageButton mIb_basepager;
     public FrameLayout mFl_basepager;
+    public ImageButton ib_changeStyle;
     public View rootView ;
     public BasePager(Activity activity){
         mActivity = activity;
@@ -28,6 +29,7 @@ public class BasePager {
         mTv_basepager = (TextView) view.findViewById(R.id.tv_basepager);
         mIb_basepager = (ImageButton) view.findViewById(R.id.ib_basepager);
         mFl_basepager = (FrameLayout) view.findViewById(R.id.fl_basepager);
+        ib_changeStyle = (ImageButton)view.findViewById(R.id.ib_changeStyle);
         mIb_basepager.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

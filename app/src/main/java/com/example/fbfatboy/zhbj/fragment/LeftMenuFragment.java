@@ -58,6 +58,7 @@ public class LeftMenuFragment extends BaseFragment {
                 MainContentFragment mainContentFragment = mainUI.getMainContentFragment();
                 NewsPager pager = mainContentFragment.getNewsPager();
                 pager.setData(position);
+                mainUI.getSlidingMenu().toggle();
             }
         });
     }
