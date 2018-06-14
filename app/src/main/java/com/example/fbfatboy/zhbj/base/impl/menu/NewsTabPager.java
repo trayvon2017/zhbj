@@ -3,15 +3,19 @@ package com.example.fbfatboy.zhbj.base.impl.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +40,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.lidroid.xutils.view.annotation.event.EventBase;
 import com.viewpagerindicator.CirclePageIndicator;
 
 
@@ -71,6 +76,7 @@ public class NewsTabPager extends BaseMenuDetailPager {
     private MoreNewsBean moreNewsBean;
     private MoreNewsBean.MoreNewsData moreNewsBeanData;
     private MyNewsAdapter mAdapter;
+    private Handler mHandler ;
 
 
     public NewsTabPager(Activity activity, NewsMenu.NewsTabData newsTabData) {
@@ -212,7 +218,48 @@ public class NewsTabPager extends BaseMenuDetailPager {
             }
         });
         tv_topnews_title.setText(mTopNews.get(0).title);
+        //发送空的message 处置轮播
+        if (mHandler == null){
+            mHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    if (msg.what == 0){
+                        int currentItem = vp_topNews.getCurrentItem();
+                        currentItem++;
+                        if (currentItem == mTopNews.size()-1 ){
+                            currentItem = 0;
+                        }
+                        vp_topNews.setCurrentItem(currentItem);
+                        sendEmptyMessageDelayed(0,5000);
+                    }
 
+                }
+            };
+            mHandler.sendEmptyMessageDelayed(0,5000);
+
+            vp_topNews.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch(event.getAction()){
+                        case MotionEvent.ACTION_DOWN:
+                            //停止轮播的执行，清楚handler的消息
+                            mHandler.removeCallbacksAndMessages(null);
+
+                            break;
+                        case MotionEvent.ACTION_UP:
+
+                            mHandler.sendEmptyMessageDelayed(0,5000);
+                            break;
+                        case MotionEvent.ACTION_CANCEL:
+
+                            mHandler.sendEmptyMessageDelayed(0,5000);
+                            break;
+                    }
+
+                    return false;
+                }
+            });
+        }
 
 
 
