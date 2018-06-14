@@ -1,25 +1,31 @@
 package com.example.fbfatboy.zhbj.base.impl.menu;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fbfatboy.zhbj.NewsPagerActiviry;
 import com.example.fbfatboy.zhbj.R;
 import com.example.fbfatboy.zhbj.base.BaseMenuDetailPager;
+import com.example.fbfatboy.zhbj.domain.MoreNewsBean;
 import com.example.fbfatboy.zhbj.domain.NewsMenu;
 import com.example.fbfatboy.zhbj.domain.NewsTabBean;
 import com.example.fbfatboy.zhbj.global.GlobalConstanst;
 import com.example.fbfatboy.zhbj.utils.CacheUtils;
+import com.example.fbfatboy.zhbj.utils.IsReadUtils;
 import com.example.fbfatboy.zhbj.utils.SpUtils;
+import com.example.fbfatboy.zhbj.view.PullToRefreshListView;
 import com.example.fbfatboy.zhbj.view.TopNewsViewPager;
 import com.google.gson.Gson;
 import com.lidroid.xutils.BitmapUtils;
@@ -32,9 +38,10 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.viewpagerindicator.CirclePageIndicator;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by fbfatboy on 2018/6/12.
@@ -48,7 +55,7 @@ public class NewsTabPager extends BaseMenuDetailPager {
     private TopNewsViewPager vp_topNews;
 
     @ViewInject(R.id.lv_news)
-    private ListView lv_news;
+    private PullToRefreshListView lv_news;
 
     @ViewInject(R.id.indicator)
     private CirclePageIndicator indicator;
@@ -60,6 +67,10 @@ public class NewsTabPager extends BaseMenuDetailPager {
     private NewsTabBean.NewsData mData;
     private ArrayList<NewsTabBean.TopNewsBean> mTopNews;
     private ArrayList<NewsTabBean.NewsBean> mNews;
+    private String more;
+    private MoreNewsBean moreNewsBean;
+    private MoreNewsBean.MoreNewsData moreNewsBeanData;
+    private MyNewsAdapter mAdapter;
 
 
     public NewsTabPager(Activity activity, NewsMenu.NewsTabData newsTabData) {
@@ -69,13 +80,72 @@ public class NewsTabPager extends BaseMenuDetailPager {
 
     @Override
     public View initView() {
-        //TODO 加载布局
         View view = View.inflate(mActivity, R.layout.news_tab_layout, null);
         ViewUtils.inject(this,view);
         View headerView = View.inflate(mActivity, R.layout.top_news_layout, null);
         ViewUtils.inject(this,headerView);
         lv_news.addHeaderView(headerView);
+        lv_news.setOnRefreshListener(new PullToRefreshListView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestDataFromServer();
+            }
+
+            @Override
+            public void loadMore() {
+                requestMoreDataFromServer();
+            }
+        });
         return view;
+    }
+
+    /**
+     * 加载更多数据
+     */
+    private void requestMoreDataFromServer() {
+        //TODO 加载更多数据，重新访问服务器
+        HttpUtils httpUtils = new HttpUtils();
+        if (!TextUtils.isEmpty(more)){
+            httpUtils.send(HttpRequest.HttpMethod.GET, GlobalConstanst.ZHBJ_SERVER + more, new RequestCallBack<String>() {
+                @Override
+                public void onSuccess(ResponseInfo<String> responseInfo) {
+                    //处理数据
+                    String result = responseInfo.result;
+                    processMoreData(result);
+
+                    //更新页面，调用lv的方法以更新
+                    lv_news.onRefreshComplete(true);
+                }
+
+                @Override
+                public void onFailure(HttpException e, String s) {
+                    //请求失败
+                    Toast.makeText(mActivity, "loadmore超时 请检查网络 ", Toast.LENGTH_SHORT).show();
+                    lv_news.onRefreshComplete(false);
+                }
+            });
+        }else {
+            Toast.makeText(mActivity, "没有更多数据 ", Toast.LENGTH_SHORT).show();
+            lv_news.onRefreshComplete(false);
+        }
+
+    }
+
+    /**
+     * 处理加载到的更多数据
+     * @param result 从服务器获取的json
+     */
+    private void processMoreData(String result) {
+        Gson gson = new Gson();
+        moreNewsBean = gson.fromJson(result, MoreNewsBean.class);
+        moreNewsBeanData = moreNewsBean.data;
+        //修改下次加载更多的url
+        more = moreNewsBeanData.more;
+        ArrayList<NewsTabBean.NewsBean> moreNews = moreNewsBeanData.news;
+        mNews.addAll(moreNews);
+        mAdapter.notifyDataSetChanged();
+
+
     }
 
     @Override
@@ -98,11 +168,13 @@ public class NewsTabPager extends BaseMenuDetailPager {
                 String result = responseInfo.result;
                 CacheUtils.saveCache(mActivity,mUrl,result);
                 processData(result);
+                lv_news.onRefreshComplete(true);
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
                 Toast.makeText(mActivity, "请求数据超时 请检查网络 newsTabpager", Toast.LENGTH_SHORT).show();
+                lv_news.onRefreshComplete(false);
             }
         });
     }
@@ -115,6 +187,10 @@ public class NewsTabPager extends BaseMenuDetailPager {
         mData = gson.fromJson(result, NewsTabBean.class).data;
         mTopNews = mData.topnews;
         mNews = mData.news;
+//        for (NewsTabBean.NewsBean newsBean :mNews){
+//            Log.d(TAG, "mNews: id:"+newsBean.id+"title:"+newsBean.title);
+//        }
+        more = mData.more;
 
         vp_topNews.setAdapter(new TopPagerAdapter());
 
@@ -142,7 +218,29 @@ public class NewsTabPager extends BaseMenuDetailPager {
 
 
         //列表新聞
-        lv_news.setAdapter(new MyNewsAdapter());
+        mAdapter = new MyNewsAdapter();
+        lv_news.setAdapter(mAdapter);
+        lv_news.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                /**由于添加了两个headerView的关系，
+                 * 所以我们需要被点击的条目对应到list数据源里面的position是从2开始的
+                 */
+                //记录位置，下次进入的时候恢复页面
+                NewsTabBean.NewsBean newsClicked =
+                        (NewsTabBean.NewsBean) mNews.get(position - 2);
+                Log.d(TAG, "onItemClick: 创建已读id："+ newsClicked.id);
+                IsReadUtils.saveReadState(mActivity,newsClicked);
+                //设置标题为灰色
+                TextView tv_news_title_clicked = (TextView) view.findViewById(R.id.tv_news_title);
+                tv_news_title_clicked.setTextColor(Color.RED);
+                //打开超链接，访问页面
+                Intent intent = new Intent(mActivity, NewsPagerActiviry.class);
+                intent.putExtra("url",newsClicked.url);
+                mActivity.startActivity(intent);
+
+            }
+        });
 
     }
 
@@ -182,6 +280,7 @@ public class NewsTabPager extends BaseMenuDetailPager {
 
     private class MyNewsAdapter extends BaseAdapter {
 
+
         @Override
         public int getCount() {
             return mNews.size();
@@ -216,6 +315,14 @@ public class NewsTabPager extends BaseMenuDetailPager {
 
             holder.tv_news_title.setText(getItem(position).title);
             holder.tv_news_pubdate.setText(getItem(position).pubdate);
+            //判断是否已读，设置文本颜色
+            if (IsReadUtils.isReaded(mActivity,getItem(position))) {
+                holder.tv_news_title.setTextColor(Color.RED);
+                Log.d(TAG, "getView: 该位置的positionid"+getItem(position).id+
+                        "title:"+getItem(position).title+"position:"+position);
+            }else {
+                holder.tv_news_title.setTextColor(Color.BLACK);
+            }
 
             return convertView;
         }

@@ -2,11 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <com.example.fbfatboy.zhbj.view.PullToRefreshListView
-        android:id="@+id/lv_news"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_detail_top"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-    </com.example.fbfatboy.zhbj.view.PullToRefreshListView>
+        android:layout_height="180dp"></android.support.v4.view.ViewPager>
+
 </LinearLayout>

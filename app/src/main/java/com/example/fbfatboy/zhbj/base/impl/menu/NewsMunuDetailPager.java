@@ -79,6 +79,7 @@ public class NewsMunuDetailPager extends BaseMenuDetailPager {
 
             @Override
             public void onPageSelected(int position) {
+                mPagers.get(position).initData();
                 MainActivity mainUI = (MainActivity) NewsMunuDetailPager.this.mActivity;
                 if (position == 0){
 
@@ -95,6 +96,7 @@ public class NewsMunuDetailPager extends BaseMenuDetailPager {
 
             }
         });
+        mPagers.get(0).initData();
     }
 
     public class TabPagerAdapter extends PagerAdapter{
@@ -120,7 +122,7 @@ public class NewsMunuDetailPager extends BaseMenuDetailPager {
             NewsTabPager newsTabPager = mPagers.get(position);
 
             View view = newsTabPager.mRootVew;
-            newsTabPager.initData();
+//            newsTabPager.initData();
             container.addView(view);
             return view;
         }

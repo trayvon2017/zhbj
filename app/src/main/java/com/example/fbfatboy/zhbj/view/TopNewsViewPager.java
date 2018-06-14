@@ -27,6 +27,8 @@ public class TopNewsViewPager extends ViewPager {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
 
+
+        //请求自己处理事件
         getParent().requestDisallowInterceptTouchEvent(true);
 
         switch (ev.getAction()){
@@ -41,20 +43,23 @@ public class TopNewsViewPager extends ViewPager {
                 int dX = moveX - startX;
                 int dY = moveY - startY;
                 Log.d("ACTION_MOVE", "dispatchTouchEvent: "+ startX +"-"+ startY);
-                //
-                if (dX>0){
-                    //在第一页的时候拦截
-                    if(getCurrentItem() == 0){
-                        getParent().requestDisallowInterceptTouchEvent(false);
-                    }
-                }else{
+                //判断是上下滑动还是左右滑动
+                if (Math.abs(dX)>Math.abs(dY)){
+                    if (dX>0){
+                        //在第一页的时候拦截
+                        if(getCurrentItem() == 0){
+                            getParent().requestDisallowInterceptTouchEvent(false);
+                        }
+                    }else{
 
-                    if (getCurrentItem()==(getAdapter().getCount()-1)){
+                        if (getCurrentItem()==(getAdapter().getCount()-1)){
 
-                        getParent().requestDisallowInterceptTouchEvent(false);
+                            getParent().requestDisallowInterceptTouchEvent(false);
+                        }
                     }
+                }else {
+                    getParent().requestDisallowInterceptTouchEvent(false);
                 }
-
                 break;
             case MotionEvent.ACTION_UP:
 
