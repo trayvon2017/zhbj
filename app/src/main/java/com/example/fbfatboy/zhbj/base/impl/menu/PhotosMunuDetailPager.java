@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,8 +17,9 @@ import com.example.fbfatboy.zhbj.base.BaseMenuDetailPager;
 import com.example.fbfatboy.zhbj.domain.PhotoJsonBean;
 import com.example.fbfatboy.zhbj.global.GlobalConstanst;
 import com.example.fbfatboy.zhbj.utils.CacheUtils;
+import com.example.fbfatboy.zhbj.utils.MemoryBitmapCacheUtils;
+import com.example.fbfatboy.zhbj.utils.MyBitmapUtils;
 import com.google.gson.Gson;
-import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -27,8 +27,6 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.lidroid.xutils.view.annotation.ViewInject;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -43,7 +41,7 @@ public class PhotosMunuDetailPager extends BaseMenuDetailPager {
     private GridView gvPhotos;
     private ImageButton mIbChangeStyle;
     private ArrayList<PhotoJsonBean.PhotoNews> mPhotoNews;
-    private BitmapUtils mBitmapUtils;
+    private MyBitmapUtils mBitmapUtils;
     private boolean isListView ;
 
 
@@ -160,7 +158,7 @@ public class PhotosMunuDetailPager extends BaseMenuDetailPager {
             holder = (ViewHolder) convertView.getTag();
             //使用BitmapUtils获取到图片，并且设置给
             if (mBitmapUtils == null){
-                mBitmapUtils = new BitmapUtils(mActivity);
+                mBitmapUtils = new MyBitmapUtils(new MemoryBitmapCacheUtils());
             }
             mBitmapUtils.display(holder.ivPhoto,getItem(position).listimage);
             holder.tvTitle.setText(getItem(position).title);
